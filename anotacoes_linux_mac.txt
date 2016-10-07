@@ -46,6 +46,20 @@ já conhece e, no caso de quem não sabe GLSL, ajuda no aprendizado.
 
 As bibliotecas serão instaladas em /usr/local/include/glm/ .
 
+- Adicionar GLM ao CMake no Ubuntu
+
+- Baixei o arquivo FindGLM.txt em https://raw.githubusercontent.com/Groovounet/glm-deprecated/master/util/FindGLM.cmake
+- No CMakeLists.txt, adicione a linha abaixo com o path onde o FindGLM.cmake pode ser encontrado. No exemplo, foi criada
+uma pasta cmake_utils para guardar esses arquivos.
+
+set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} /home/User/Desenvolvimento/cmake_utils)
+
+- Ainda no CMakeLists.txt, adicione as linhas abaixo para incluir o GLM
+
+find_package(GLM REQUIRED)
+include_directories(${GLM_INCLUDE_DIRS})
+
+
 [1] https://github.com/mfoo/Math-Library-Test
 
 
