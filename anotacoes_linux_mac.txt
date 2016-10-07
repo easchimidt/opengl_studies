@@ -1,0 +1,67 @@
+Boa parte do guia abaixo funciona tanto no Mac quanto no Ubuntu.
+
+No Ubuntu foram puladas algumas partes, como instalação das bibliotecas libgl-dev. Mas, abaixo,
+ao instalar o GLEW, boa parte das bibliotecas necessárias são instaladas.
+
+No Ubuntu, são necessárias as seguintes libs: GL GLEW X11 Xrandr Xinerama Xxf86vm Xcursor.
+
+No Mac,
+
+- Instalando GLEW
+
+Infelizmente os headers do OpenGL contém apenas funções antigas, da versão 1.1 para trás.
+
+Para conseguir utilizar funções mais novas, como glGenVertexArrays e glBindVertexArray, que
+entraram na especificação 3.0 do OpenGL, é preciso, no Ubuntu, instalar o GLEW.
+
+- Primeiramente, instale as dependências do GLEW:
+
+	sudo apt-get install libXmu-dev libXi-dev libgl-dev dos2unix git wget
+
+(OBS: A libgl-dev já vem na libgl1-mesa-dev)
+
+- Faça um clone do projeto git: git clone https://github.com/nigels-com/glew.git glew
+- Acesse a pasta auto dentro de glew: cd glew/auto
+- Faça build do projeto: make
+- Volte para a raíz do GLEW: cd ..
+- Faça build do GLEW: make
+- Instale os binários: make install
+
+A biblioteca libGLEW ficará em /usr/lib/libGLEW.so.2.0. Os headers estarão na mesma pasta
+do OpenGL, em /usr/include/GL. Os três arquivos instalados lá são wglew.h, glew.h e glxew.h.
+
+
+- Instalando glm
+
+A GLM é uma biblioteca matemática para C++. Além de possuir um bom desempenho [1], sua sintaxe
+segue o padrão da linguagem GLSL, para programação de shaders, o que facilita a vida de quem
+já conhece e, no caso de quem não sabe GLSL, ajuda no aprendizado.
+
+- Clone o repositório do glm: git clone https://github.com/g-truc/glm.git
+- Acesse a pasta glm, criada após clonagem do repositório.
+- Gere o Makefile via CMake: cmake -H. -Bbuild
+- Acesse a pasta build: cd build
+- Compile: make
+- Instale os headers: sudo make install
+
+As bibliotecas serão instaladas em /usr/local/include/glm/ .
+
+[1] https://github.com/mfoo/Math-Library-Test
+
+
+____
+
+Mac:
+
+No Mac, ao tentar compilar os shaders ocorreu o erro ‘version '330' is not supported’.
+
+Segundo a resposta  do StackOverflow, o problema é que, por padrão, o Mac utiliza Legacy Profiles, que suporta OpenGL até 2.1 e GLSL até 1.20.
+
+Para resolver esse problema com o GLFW, basta incluir as linhas abaixo antes de criar a janela:
+
+glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+
+window = glfwCreateWindow(640, 480, "Teste OpenGL", NULL, NULL);
