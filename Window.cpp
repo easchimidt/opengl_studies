@@ -3,8 +3,11 @@
 //
 
 #include <chrono>
+#include <stdexcept>
 
 #include "Window.h"
+
+using namespace std;
 
 // Unfortunatelly, to make our Scene class handle inputs we have to copy
 // its pointer to a global variable. Then, it can be accessed in
@@ -28,6 +31,7 @@ Window::Window(Scene *_scene) : Window(_scene, 800, 600, "Window") {}
 void Window::init() {
 
     if (glfwInit() != GLFW_TRUE) {
+        throw std::invalid_argument("Error initiating GLFW." );
         exit(1);
     }
 
@@ -41,6 +45,7 @@ void Window::init() {
     window = glfwCreateWindow(width, height, title.c_str(), NULL, NULL);
 
     if (window == NULL) {
+        throw std::invalid_argument("Error creating Window." );
         glfwTerminate();
         exit(1);
     }

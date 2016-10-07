@@ -35,6 +35,7 @@ void Triangle::init() {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
 
+    // Lines below are needed in Linux
     glewExperimental = GL_TRUE;
     glewInit();
 
@@ -200,7 +201,7 @@ int compileShader(int shaderType, const char* code) {
     int shader = glCreateShader(shaderType);
 
     if (shader == 0) {
-        cout << "Erro ao criar o shader!" << endl;
+        cout << "Error creating shader!" << endl;
         return -1;
     }
     glShaderSource(shader, 1, &code, NULL);

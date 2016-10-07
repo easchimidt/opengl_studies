@@ -13,14 +13,12 @@
 #include "Triangle.h"
 #include "Window.h"
 
-
 using namespace std;
 
 int compileShader(int shaderType, const char* code);
 int linkProgram(initializer_list<int> shaders);
 
-
-string* readFile(char* filename) {
+string* readFile(const char* filename) {
     ifstream file(filename);
     string *fileContent;
 
@@ -43,36 +41,66 @@ void Triangle::init() {
     glGenVertexArrays(1, &vao);
 
     float vertexData[] = {
-            0.0f, 0.5f,
-            -0.5f, -0.5f,
-            0.5f, -0.5f
+            0.0f, 0.5f, 0.5f,
+            -0.5f, -0.5f, 0.5f,
+            0.5f, -0.5f, 0.5f
+    };
+
+    float cubeVertex[] = {
+            -0.5f, 0.5f, 0.5f, // 0. top, front, left
+            -0.5f, -0.5f, 0.5f, // 1. bottom, front, left
+            0.5f, -0.5f, 0.5f, // 2. bottom, front, right
+            0.5f, 0.5f, 0.5f, // 3. top, front, right
+
+            0.5f, 0.5f, -0.5f, // 4. top, back, right
+            0.5f, -0.5f, -0.5f, // 5. bottom, back, right
+
+            -0.5f, 0.5f, -0.5f, // 6. top, back, left
+            -0.5f, -0.5f, -0.5f, // 7. bottom, back, left
     };
 
     float vertexColor[] = {
             0.0f, 0.0f, 1.0f,
             0.0f, 1.0f, 0.0f,
-            1.0f, 0.0f, 0.0f
+            1.0f, 0.0f, 0.0f,
+            0.0f, 0.0f, 1.0f,
+            0.0f, 1.0f, 0.0f,
+            1.0f, 0.0f, 0.0f,
+            0.0f, 0.0f, 1.0f,
+            0.0f, 1.0f, 0.0f
     };
 
     int indexData[] = {
-            0, 1, 2
+            // front
+            0, 1, 2,
+            3, 0, 2,
+            // right
+            3, 2, 5,
+            4, 3, 5,
+            // back
+            4, 5, 6,
+            6, 5, 7,
+            // left
+            6, 7, 0,
+            0, 7, 1,
+            // top
+            6, 0, 3,
+            4, 6, 3,
+            // bottom
+            1, 7, 5,
+            2, 1, 5
     };
 
     // Color attribution
-    glGenBuffers(1, &colors);
-    glBindBuffer(GL_ARRAY_BUFFER, colors);
-    glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(float), vertexColor, GL_STATIC_DRAW);
+    colors = new ArrayBuffer(sizeof(vertexColor), vertexColor);
 
     // Position attribution
-    glGenBuffers(1, &positions);
-    glBindBuffer(GL_ARRAY_BUFFER, positions);
-    glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(float), vertexData, GL_STATIC_DRAW);
+    positions = new ArrayBuffer(sizeof(cubeVertex), cubeVertex);
 
     // Position index attribution
     glGenBuffers(1, &index);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3 * sizeof(int), indexData, GL_STATIC_DRAW);
-    //(sizeof(indexData)/sizeof(indexData[0]))
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indexData), indexData, GL_STATIC_DRAW);
 
     int vertex = compileShader(GL_VERTEX_SHADER, readFile("/Users/emanuel/ClionProjects/estudosOpenGL/shader.vert")->c_str());
     int frag = compileShader(GL_FRAGMENT_SHADER, readFile("/Users/emanuel/ClionProjects/estudosOpenGL/shader.frag")->c_str());
@@ -96,7 +124,8 @@ void Triangle::draw() {
     glBindVertexArray(vao);
 
     glm::mat4 matrix = glm::mat4(1.0);
-    matrix = glm::rotate(matrix, angle, glm::vec3(0.0f, 1.0f, 0.0f));
+    matrix = glm::rotate(matrix, angleX, glm::vec3(0.0f, 1.0f, 0.0f));
+    matrix = glm::rotate(matrix, angleY, glm::vec3(1.0f, 0.0f, 0.0f));
 
     // Set uWorld
     int uWorld = glGetUniformLocation(shader, "uWorld");
@@ -105,33 +134,48 @@ void Triangle::draw() {
     // Set vertex position
     GLuint aPosition = glGetAttribLocation(shader, "aPosition");
     glEnableVertexAttribArray(aPosition);
-    glBindBuffer(GL_ARRAY_BUFFER, positions);
-    glVertexAttribPointer(aPosition, 2, GL_FLOAT, false, 0, 0);
+    positions->bind();
+    glVertexAttribPointer(aPosition, 3, GL_FLOAT, false, 0, 0);
 
     // Set vertex color
     GLuint aColor = glGetAttribLocation(shader, "aColor");
     glEnableVertexAttribArray(aColor);
-    glBindBuffer(GL_ARRAY_BUFFER, colors);
+    colors->bind();
     glVertexAttribPointer(aColor, 3, GL_FLOAT, false, 0, 0);
 
-//    glDrawArrays(GL_TRIANGLES, 0, 3);
-
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index);
-    glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
     glDisableVertexAttribArray(aPosition);
     glDisableVertexAttribArray(aColor);
+    positions->unbind();
+    colors->unbind();
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
     glUseProgram(0);
 }
 void Triangle::deinit() {
 
 }
+
+Triangle::~Triangle() {
+    if (positions) {
+        delete positions;
+        delete colors;
+    }
+}
+
 void Triangle::keyPressed(GLFWwindow *window, int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
         glfwSetWindowShouldClose(window, GLFW_TRUE);
+    if (key == GLFW_KEY_A)
+        angleX -= 0.1;
+    if (key == GLFW_KEY_D)
+        angleX += 0.1;
+    if (key == GLFW_KEY_W)
+        angleY -= 0.1;
+    if (key == GLFW_KEY_S)
+        angleY += 0.1;
 }
 
 void printGLCharMessage(vector<GLchar> message) {
@@ -143,7 +187,7 @@ int compileShader(int shaderType, const char* code) {
     int shader = glCreateShader(shaderType);
 
     if (shader == 0) {
-        cout << "Erro ao criar o shader!" << endl;
+        cout << "Error creating shader!" << endl;
         return -1;
     }
     glShaderSource(shader, 1, &code, NULL);

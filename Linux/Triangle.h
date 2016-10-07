@@ -19,8 +19,6 @@ public:
     void keyPressed(GLFWwindow *window, int key, int scancode, int action, int mods);
 
     GLuint vao;
-    // GLuint positions;
-    // GLuint colors;
     GLuint index;
     GLuint shader;
     ArrayBuffer *positions;

@@ -8,6 +8,6 @@ include_directories(${GLM_INCLUDE_DIRS})
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-set(SOURCE_FILES Window.cpp Window.h Scene.h Triangle.cpp Triangle.h)
+set(SOURCE_FILES Window.cpp Window.h Scene.h Triangle.cpp Triangle.h ArrayBuffer.cpp ArrayBuffer.h IndexBuffer.cpp IndexBuffer.h)
 add_executable(estudosOpenGL ${SOURCE_FILES})
 target_link_libraries(estudosOpenGL glfw glm "-framework OpenGL")
