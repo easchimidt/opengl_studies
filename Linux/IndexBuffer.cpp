@@ -5,16 +5,16 @@
 
 #include "IndexBuffer.h"
 
-IndexBuffer::IndexBuffer(int _totalBytes, float *data) {
+IndexBuffer::IndexBuffer(int _totalBytes, int *data) {
     if (_totalBytes < 1) {
-		throw std::invalid_argument("Cannot create Index Buffer. Number of bytes must be bigger then 0." );
+        throw std::invalid_argument("Cannot create Index Buffer. Number of bytes must be bigger then 0." );
     }
     if (data == NULL) {
-    	throw std::invalid_argument("Cannot create Index Buffer. Data cannot be null.");
+        throw std::invalid_argument("Cannot create Index Buffer. Data cannot be null.");
     }
-    
-	totalBytes = _totalBytes;
-    numElements = totalBytes / sizeof(float);
+
+    totalBytes = _totalBytes;
+    numElements = totalBytes / sizeof(int);
 
     glGenBuffers(1, &id);
 
@@ -32,5 +32,7 @@ void IndexBuffer::unbind() {
 }
 
 void IndexBuffer::draw() {
-	glDrawArrays(GL_TRIANGLES, 0, numElements);	
+    bind();
+    glDrawElements(GL_TRIANGLES, numElements, GL_UNSIGNED_INT, 0);
+    unbind();
 }

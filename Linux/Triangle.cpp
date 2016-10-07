@@ -95,21 +95,13 @@ void Triangle::init() {
     };
 
     // Color attribution
-    // glGenBuffers(1, &colors);
-    // glBindBuffer(GL_ARRAY_BUFFER, colors);
-    // glBufferData(GL_ARRAY_BUFFER, sizeof(vertexColor), vertexColor, GL_STATIC_DRAW);
     colors = new ArrayBuffer(sizeof(vertexColor), vertexColor);
 
     // Position attribution
-    // glGenBuffers(1, &positions);
-    // glBindBuffer(GL_ARRAY_BUFFER, positions);
-    // glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertex), cubeVertex, GL_STATIC_DRAW);
     positions = new ArrayBuffer(sizeof(cubeVertex), cubeVertex);
 
     // Position index attribution
-    glGenBuffers(1, &index);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indexData), indexData, GL_STATIC_DRAW);
+    index = new IndexBuffer(sizeof(indexData), indexData);
 
     int vertex = compileShader(GL_VERTEX_SHADER, readFile("/home/05367019978/Desenvolvimento/opengl/estudosOpenGL/shader.vert")->c_str());
     int frag = compileShader(GL_FRAGMENT_SHADER, readFile("/home/05367019978/Desenvolvimento/opengl/estudosOpenGL/shader.frag")->c_str());
@@ -142,22 +134,16 @@ void Triangle::draw() {
     // Set vertex position
     GLuint aPosition = glGetAttribLocation(shader, "aPosition");
     glEnableVertexAttribArray(aPosition);
-    // glBindBuffer(GL_ARRAY_BUFFER, positions);
     positions->bind();
     glVertexAttribPointer(aPosition, 3, GL_FLOAT, false, 0, 0);
 
     // Set vertex color
     GLuint aColor = glGetAttribLocation(shader, "aColor");
     glEnableVertexAttribArray(aColor);
-    // glBindBuffer(GL_ARRAY_BUFFER, colors);
     colors->bind();
     glVertexAttribPointer(aColor, 3, GL_FLOAT, false, 0, 0);
 
-    // positions->draw();
-    // glDrawArrays(GL_TRIANGLES, 0, 6);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index);
-    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+    index->draw();
 
     glDisableVertexAttribArray(aPosition);
     glDisableVertexAttribArray(aColor);

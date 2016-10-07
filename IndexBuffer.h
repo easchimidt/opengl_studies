@@ -4,7 +4,7 @@
 class IndexBuffer {
 public:
 	IndexBuffer();
-    IndexBuffer(int _totalBytes, float *data);
+    IndexBuffer(int _totalBytes, int *data);
     ~IndexBuffer(){}
     void bind();
     void unbind();

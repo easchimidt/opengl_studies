@@ -98,9 +98,7 @@ void Triangle::init() {
     positions = new ArrayBuffer(sizeof(cubeVertex), cubeVertex);
 
     // Position index attribution
-    glGenBuffers(1, &index);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indexData), indexData, GL_STATIC_DRAW);
+    index = new IndexBuffer(sizeof(indexData), indexData);
 
     int vertex = compileShader(GL_VERTEX_SHADER, readFile("/Users/emanuel/ClionProjects/estudosOpenGL/shader.vert")->c_str());
     int frag = compileShader(GL_FRAGMENT_SHADER, readFile("/Users/emanuel/ClionProjects/estudosOpenGL/shader.frag")->c_str());
@@ -143,14 +141,12 @@ void Triangle::draw() {
     colors->bind();
     glVertexAttribPointer(aColor, 3, GL_FLOAT, false, 0, 0);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index);
-    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+    index->draw();
 
     glDisableVertexAttribArray(aPosition);
     glDisableVertexAttribArray(aColor);
     positions->unbind();
     colors->unbind();
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
     glUseProgram(0);
 }

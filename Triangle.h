@@ -6,6 +6,7 @@
 #define ESTUDOSOPENGL_TRIANGLE_H
 
 #include "ArrayBuffer.h"
+#include "IndexBuffer.h"
 #include "Scene.h"
 
 class Triangle : public Scene {
@@ -19,10 +20,10 @@ public:
     void keyPressed(GLFWwindow *window, int key, int scancode, int action, int mods);
 
     GLuint vao;
-    GLuint index;
     GLuint shader;
     ArrayBuffer *positions;
     ArrayBuffer *colors;
+    IndexBuffer *index;
     float angleX, angleY;
 };
 
