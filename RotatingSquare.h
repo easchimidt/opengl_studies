@@ -9,22 +9,22 @@
 #include "IndexBuffer.h"
 #include "Scene.h"
 #include "Shader.h"
+#include "Mesh.h"
 
-class Triangle : public Scene {
+class RotatingSquare : public Scene {
+private:
+    Mesh* mesh;
+    float angle;
+
 public:
-    Triangle() {}
-    ~Triangle();
+    RotatingSquare() {}
+    ~RotatingSquare();
     void init();
     void update(float secs);
     void draw();
     void deinit();
     void keyPressed(GLFWwindow *window, int key, int scancode, int action, int mods);
 
-    GLuint vao;
-    ArrayBuffer *positions;
-    ArrayBuffer *colors;
-    IndexBuffer *index;
-    Shader* shader;
     float angleX, angleY;
 };
 

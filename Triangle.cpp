@@ -12,26 +12,9 @@
 
 #include "Triangle.h"
 #include "Window.h"
+#include "Shader.h"
 
 using namespace std;
-
-int compileShader(int shaderType, const char* code);
-int linkProgram(initializer_list<int> shaders);
-
-string* readFile(const char* filename) {
-    ifstream file(filename);
-    string *fileContent;
-
-    if (file.is_open()) {
-        fileContent = new string((std::istreambuf_iterator<char>(file)),
-                             std::istreambuf_iterator<char>());
-    }
-    else {
-        cout << "Error reading file " << filename << ". Error: " << strerror(errno) << endl;
-    }
-    file.close();
-    return fileContent;
-}
 
 void Triangle::init() {
     glEnable(GL_DEPTH_TEST);
@@ -40,13 +23,13 @@ void Triangle::init() {
 
     glGenVertexArrays(1, &vao);
 
-    float vertexData[] = {
+    std::vector<float> vertexData = {
             0.0f, 0.5f, 0.5f,
             -0.5f, -0.5f, 0.5f,
             0.5f, -0.5f, 0.5f
     };
 
-    float cubeVertex[] = {
+    std::vector<float> cubeVertex = {
             -0.5f, 0.5f, 0.5f, // 0. top, front, left
             -0.5f, -0.5f, 0.5f, // 1. bottom, front, left
             0.5f, -0.5f, 0.5f, // 2. bottom, front, right
@@ -56,10 +39,10 @@ void Triangle::init() {
             0.5f, -0.5f, -0.5f, // 5. bottom, back, right
 
             -0.5f, 0.5f, -0.5f, // 6. top, back, left
-            -0.5f, -0.5f, -0.5f, // 7. bottom, back, left
+            -0.5f, -0.5f, -0.5f // 7. bottom, back, left
     };
 
-    float vertexColor[] = {
+    std::vector<float> vertexColor = {
             0.0f, 0.0f, 1.0f,
             0.0f, 1.0f, 0.0f,
             1.0f, 0.0f, 0.0f,
@@ -70,7 +53,7 @@ void Triangle::init() {
             0.0f, 1.0f, 0.0f
     };
 
-    int indexData[] = {
+    std::vector<int> indexData = {
             // front
             0, 1, 2,
             3, 0, 2,
@@ -92,18 +75,15 @@ void Triangle::init() {
     };
 
     // Color attribution
-    colors = new ArrayBuffer(sizeof(vertexColor), vertexColor);
+    colors = new ArrayBuffer(3, vertexColor);
 
     // Position attribution
-    positions = new ArrayBuffer(sizeof(cubeVertex), cubeVertex);
+    positions = new ArrayBuffer(3, cubeVertex);
 
     // Position index attribution
-    index = new IndexBuffer(sizeof(indexData), indexData);
+    index = new IndexBuffer(indexData);
 
-    int vertex = compileShader(GL_VERTEX_SHADER, readFile("/Users/emanuel/ClionProjects/estudosOpenGL/shader.vert")->c_str());
-    int frag = compileShader(GL_FRAGMENT_SHADER, readFile("/Users/emanuel/ClionProjects/estudosOpenGL/shader.frag")->c_str());
-
-    shader = linkProgram( {vertex, frag });
+    shader = Shader::loadProgram( { "/Users/emanuel/ClionProjects/estudosOpenGL/shader/shader" });
 
     // Clean up mess
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -118,7 +98,7 @@ float angle = 0;
 void Triangle::draw() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glUseProgram(shader);
+    shader->bind();
     glBindVertexArray(vao);
 
     glm::mat4 matrix = glm::mat4(1.0);
@@ -126,32 +106,25 @@ void Triangle::draw() {
     matrix = glm::rotate(matrix, angleY, glm::vec3(1.0f, 0.0f, 0.0f));
 
     // Set uWorld
-    int uWorld = glGetUniformLocation(shader, "uWorld");
+    int uWorld = glGetUniformLocation(shader->id, "uWorld");
     glUniformMatrix4fv(uWorld, 1, GL_FALSE, glm::value_ptr(matrix));
 
     // Set vertex position
-    GLuint aPosition = glGetAttribLocation(shader, "aPosition");
-    glEnableVertexAttribArray(aPosition);
-    positions->bind();
-    glVertexAttribPointer(aPosition, 3, GL_FLOAT, false, 0, 0);
+    shader->setAttribute("aPosition", positions);
 
     // Set vertex color
-    GLuint aColor = glGetAttribLocation(shader, "aColor");
-    glEnableVertexAttribArray(aColor);
-    colors->bind();
-    glVertexAttribPointer(aColor, 3, GL_FLOAT, false, 0, 0);
+    shader->setAttribute("aColor", colors);
 
     index->draw();
 
-    glDisableVertexAttribArray(aPosition);
-    glDisableVertexAttribArray(aColor);
+    shader->setAttribute("aPosition", nullptr);
+    shader->setAttribute("aColor", nullptr);
     positions->unbind();
     colors->unbind();
     glBindVertexArray(0);
     glUseProgram(0);
 }
 void Triangle::deinit() {
-
 }
 
 Triangle::~Triangle() {
@@ -173,71 +146,6 @@ void Triangle::keyPressed(GLFWwindow *window, int key, int scancode, int action,
     if (key == GLFW_KEY_S)
         angleY += 0.1;
 }
-
-void printGLCharMessage(vector<GLchar> message) {
-    for (vector<char>::const_iterator i = message.begin(); i != message.end(); ++i)
-        cout << *i;
-}
-
-int compileShader(int shaderType, const char* code) {
-    int shader = glCreateShader(shaderType);
-
-    if (shader == 0) {
-        cout << "Error creating shader!" << endl;
-        return -1;
-    }
-    glShaderSource(shader, 1, &code, NULL);
-
-    glCompileShader(shader);
-
-    GLint success;
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-
-    if (success == GL_FALSE) {
-        GLint maxLength = 0;
-        glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &maxLength);
-        vector<GLchar> errorLog(maxLength);
-        glGetShaderInfoLog(shader, maxLength, &maxLength, &errorLog[0]);
-
-        cout << "Unable to compile shader. " << endl;
-        printGLCharMessage(errorLog);
-
-        return -1;
-    }
-
-    return shader;
-}
-
-int linkProgram(initializer_list<int> shaders) {
-    int program = glCreateProgram();
-
-    for( auto shader : shaders) {
-        glAttachShader(program, shader);
-    }
-
-    glLinkProgram(program);
-    GLint result;
-    glGetProgramiv(program, GL_LINK_STATUS, &result);
-
-    if (result == GL_FALSE) {
-        GLint maxLength = 0;
-        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
-        vector<GLchar> errorLog(maxLength);
-        glGetProgramInfoLog(program, maxLength, &maxLength, &errorLog[0]);
-
-        cout << "Unable to link shaders. " << endl;
-        printGLCharMessage(errorLog);
-        return -1;
-    }
-
-    for (auto shader : shaders) {
-        glDetachShader(program, shader);
-        glDeleteShader(shader);
-    }
-    return program;
-}
-
-
 
 int main(void) {
     Window *window = new Window(new Triangle());
