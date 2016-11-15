@@ -12,6 +12,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 set(SOURCE_FILES Window.cpp Window.h Scene.h
         ArrayBuffer.cpp ArrayBuffer.h IndexBuffer.cpp IndexBuffer.h Shader.cpp Shader.h
         Mesh.cpp Mesh.h MeshBuilder.cpp MeshBuilder.h
-        RotatingSquare.h RotatingSquare.cpp)
+        RotatingSquare.h RotatingSquare.cpp MeshFactory.cpp MeshFactory.h)
 add_executable(estudosOpenGL ${SOURCE_FILES})
 target_link_libraries(estudosOpenGL glfw glm "-framework OpenGL")

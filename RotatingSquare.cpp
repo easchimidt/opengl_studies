@@ -15,59 +15,18 @@
 #include "Shader.h"
 #include "MeshBuilder.h"
 #include "UniformType.h"
+#include "MeshFactory.h"
 
 using namespace std;
 
 void RotatingSquare::init() {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-    mesh = (new MeshBuilder())
-            ->addVector3fAttribute("aPosition",
-                  {-0.5f, 0.5f, 0.5f, // 0. top, front, left
-                  -0.5f, -0.5f, 0.5f, // 1. bottom, front, left
-                  0.5f, -0.5f, 0.5f, // 2. bottom, front, right
-                  0.5f, 0.5f, 0.5f, // 3. top, front, right
-
-                  0.5f, 0.5f, -0.5f, // 4. top, back, right
-                  0.5f, -0.5f, -0.5f, // 5. bottom, back, right
-
-                  -0.5f, 0.5f, -0.5f, // 6. top, back, left
-                  -0.5f, -0.5f, -0.5f // 7. bottom, back, left)
-                 })
-            ->addVector3fAttribute("aColor",
-                 {0.0f, 0.0f, 1.0f,
-                  0.0f, 1.0f, 0.0f,
-                  1.0f, 0.0f, 0.0f,
-                  0.0f, 0.0f, 1.0f,
-                  0.0f, 1.0f, 0.0f,
-                  1.0f, 0.0f, 0.0f,
-                  0.0f, 0.0f, 1.0f,
-                  0.0f, 1.0f, 0.0f}
-            )
-            ->setIndexBuffer(
-                    {// front
-                    0, 1, 2,
-                    3, 0, 2,
-                    // right
-                    3, 2, 5,
-                    4, 3, 5,
-                    // back
-                    4, 5, 6,
-                    6, 5, 7,
-                    // left
-                    6, 7, 0,
-                    0, 7, 1,
-                    // top
-                    6, 0, 3,
-                    4, 6, 3,
-                    // bottom
-                    1, 7, 5,
-                    2, 1, 5}
-            )
-            ->loadShader({ "/Users/emanuel/ClionProjects/estudosOpenGL/shader/shader" })
-            ->create();
+//    mesh = MeshFactory::createCube();
+    mesh = MeshFactory::createPlane(10, 5);
 }
 
 void RotatingSquare::update(float secs) {
