@@ -8,10 +8,11 @@
 #include "Mesh.h"
 
 class MeshFactory {
-
 public:
     static Mesh* createCube();
     static Mesh* createPlane(int depth, int width);
+    static Mesh* createSphere(float ratio, int hSlices, int vSlices);
+    static Mesh* loadTerrain(std::string filename, float scale);
 };
 
 

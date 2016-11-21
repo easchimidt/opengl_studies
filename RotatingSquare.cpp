@@ -26,7 +26,9 @@ void RotatingSquare::init() {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
 //    mesh = MeshFactory::createCube();
-    mesh = MeshFactory::createPlane(10, 5);
+//    mesh = MeshFactory::createPlainene(15, 15);
+//    mesh = MeshFactory::createSphere(0.5f, 32, 32);
+     mesh = MeshFactory::loadTerrain("/Users/emanuel/Documents/Pos/Jogos_3D/img/terrain/river.png", 0.001f);
 }
 
 void RotatingSquare::update(float secs) {
