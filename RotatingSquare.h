@@ -10,10 +10,12 @@
 #include "Scene.h"
 #include "Shader.h"
 #include "Mesh.h"
+#include "Camera.h"
 
 class RotatingSquare : public Scene {
 private:
     Mesh* mesh;
+    Camera *camera;
     float angle;
 
 public:

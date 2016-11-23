@@ -14,6 +14,6 @@ SET( CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS}" )
 set(SOURCE_FILES stb_image.h Window.cpp Window.h Scene.h
         ArrayBuffer.cpp ArrayBuffer.h IndexBuffer.cpp IndexBuffer.h Shader.cpp Shader.h
         Mesh.cpp Mesh.h MeshBuilder.cpp MeshBuilder.h
-        RotatingSquare.h RotatingSquare.cpp MeshFactory.cpp MeshFactory.h Utils.h)
+        RotatingSquare.h RotatingSquare.cpp MeshFactory.cpp MeshFactory.h Utils.h Utils.cpp Camera.cpp Camera.h)
 add_executable(estudosOpenGL ${SOURCE_FILES})
 target_link_libraries(estudosOpenGL glfw glm "-framework OpenGL")

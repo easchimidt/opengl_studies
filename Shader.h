@@ -13,8 +13,7 @@ public:
     ~Shader() {}
     static std::string* readFile(std::string filename);
     static GLuint linkProgram(std::vector<int> shaders);
-    static GLuint compileShader(GLuint shaderType, const char* code);
-    static std::string getGLCharMessage(std::vector<GLchar> message);
+    static GLuint compileShader(GLuint shaderType, const GLchar* code);
     static Shader* loadProgram(std::initializer_list<std::string> shaders);
     static int loadShader(std::string shader_filename);
     Shader* setAttribute(std::string name, ArrayBuffer* buffer);

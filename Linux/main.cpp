@@ -140,7 +140,7 @@ int main(void) {
         GLuint aPosition = glGetAttribLocation(shader, "aPosition");
         glEnableVertexAttribArray(aPosition);
         glBindBuffer(GL_ARRAY_BUFFER, positions);
-        glVertexAttribPointer(aPosition, 2, GL_FLOAT, false, 0, 0);
+        glVertexAttribPointer(aPosition, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
         glDrawArrays(GL_TRIANGLES, 0, 3);
 

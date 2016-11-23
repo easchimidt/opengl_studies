@@ -5,9 +5,8 @@
 #ifndef ESTUDOSOPENGL_UTILS_H
 #define ESTUDOSOPENGL_UTILS_H
 
-#define STB_IMAGE_IMPLEMENTATION
-
 #include <sstream>
+#include <math.h>
 #include "stb_image.h"
 
 class Utils {
@@ -19,19 +18,16 @@ public:
         int bpp;
     };
 
-    static void readImageFile(std::string filename, Image *image) {
-        image->rgb = stbi_load( filename.c_str(), &(image->width), &image->height, &image->bpp, 1 );
+    static void readImageFile(std::string filename, Image *image);
+    static void freeStb(unsigned char *std_pointer);
 
-        if (image->rgb == NULL) {
-            std::ostringstream os;
-            os << "Error reading file " << filename << ". Error: " << strerror(errno) << std::endl;
-            throw std::invalid_argument(os.str());
-        }
+    static inline float toRadians(float angle) {
+        return (float)(angle * M_PI / 180.0f);
+    }
+
+    static inline float toDegree(float radians) {
+        return (float)(180.0f * radians / M_PI);
     }
 };
-
-
-
-
 
 #endif //ESTUDOSOPENGL_UTILS_H

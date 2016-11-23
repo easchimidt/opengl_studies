@@ -57,7 +57,6 @@ MeshBuilder* MeshBuilder::setIndexBuffer(IndexBuffer* indexBuffer) {
 
 MeshBuilder* MeshBuilder::setIndexBuffer(const std::vector<int>& values) {
     return setIndexBuffer(new IndexBuffer(values));
-    return this;
 }
 
 MeshBuilder* MeshBuilder::setIndexBuffer(int array_size, int* values) {

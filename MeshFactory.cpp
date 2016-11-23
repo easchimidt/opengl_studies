@@ -264,7 +264,7 @@ Mesh* MeshFactory::loadTerrain(std::string filename, float scale) {
         }
     }
 
-    stbi_image_free( image.rgb );
+    Utils::freeStb( image.rgb );
 
     return (new MeshBuilder())
             ->addVector3fAttribute("aPosition", vertex.size() * 3, &vertex[0].x)

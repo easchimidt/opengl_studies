@@ -135,13 +135,13 @@ void Triangle::draw() {
     GLuint aPosition = glGetAttribLocation(shader, "aPosition");
     glEnableVertexAttribArray(aPosition);
     positions->bind();
-    glVertexAttribPointer(aPosition, 3, GL_FLOAT, false, 0, 0);
+    glVertexAttribPointer(aPosition, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
     // Set vertex color
     GLuint aColor = glGetAttribLocation(shader, "aColor");
     glEnableVertexAttribArray(aColor);
     colors->bind();
-    glVertexAttribPointer(aColor, 3, GL_FLOAT, false, 0, 0);
+    glVertexAttribPointer(aColor, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
     index->draw();
 

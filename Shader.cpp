@@ -41,11 +41,11 @@ GLuint Shader::linkProgram(std::vector<int> shaders) {
     if (result == GL_FALSE) {
         GLint maxLength = 0;
         glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
-        std::vector<GLchar> errorLog(maxLength);
-        glGetProgramInfoLog(program, maxLength, &maxLength, &errorLog[0]);
+        GLchar errorLog[maxLength];
+        glGetProgramInfoLog(program, maxLength, &maxLength, errorLog);
 
         std::ostringstream os;
-        os << "Unable to link shaders. " << getGLCharMessage(errorLog);
+        os << "Unable to link shaders. " << errorLog;
         throw std::invalid_argument(os.str());
     }
 
@@ -56,7 +56,7 @@ GLuint Shader::linkProgram(std::vector<int> shaders) {
     return program;
 }
 
-GLuint Shader::compileShader(GLuint shaderType, const char* code) {
+GLuint Shader::compileShader(GLuint shaderType, const GLchar* code) {
     GLuint shader = glCreateShader(shaderType);
 
     if (shader == 0) {
@@ -72,23 +72,15 @@ GLuint Shader::compileShader(GLuint shaderType, const char* code) {
     if (success == GL_FALSE) {
         GLint maxLength = 0;
         glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &maxLength);
-        std::vector<GLchar> errorLog(maxLength);
-        glGetShaderInfoLog(shader, maxLength, &maxLength, &errorLog[0]);
+        GLchar errorLog[maxLength];
+        glGetShaderInfoLog(shader, maxLength, &maxLength, errorLog);
 
         std::ostringstream os;
-        os << "Unable to compile shaders. " << getGLCharMessage(errorLog);
+        os << "Unable to compile shaders. " << errorLog;
         throw std::invalid_argument(os.str());
     }
 
     return shader;
-}
-
-std::string Shader::getGLCharMessage(std::vector<GLchar> message) {
-    std::ostringstream os;
-    for (std::vector<char>::const_iterator i = message.begin(); i != message.end(); ++i) {
-        os << *i;
-    }
-    return os.str();
 }
 
 Shader* Shader::bind() {
@@ -196,7 +188,7 @@ Shader* Shader::setAttribute(std::string name, ArrayBuffer* buffer) {
     else {
         glEnableVertexAttribArray(attribute);
         buffer->bind();
-        glVertexAttribPointer(attribute, buffer->element_size, GL_FLOAT, false, 0, 0);
+        glVertexAttribPointer(attribute, buffer->element_size, GL_FLOAT, GL_FALSE, 0, 0);
     }
     return this;
 }
