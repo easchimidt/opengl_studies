@@ -7,8 +7,9 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-void Utils::readImageFile(std::string filename, Image *image) {
-    image->rgb = stbi_load( filename.c_str(), &(image->width), &image->height, &image->bpp, 1 );
+void Utils::readImageFile(std::string filename, Image *image, bool greyscale) {
+    int components = (greyscale ? 1 : 4); // # of components (rgba) desired from the image
+    image->rgb = stbi_load( filename.c_str(), &(image->width), &image->height, &image->bpp, components );
 
     if (image->rgb == NULL) {
         std::ostringstream os;

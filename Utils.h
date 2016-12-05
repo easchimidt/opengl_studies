@@ -18,7 +18,7 @@ public:
         int bpp;
     };
 
-    static void readImageFile(std::string filename, Image *image);
+    static void readImageFile(std::string filename, Image *image, bool greyscale);
     static void freeStb(unsigned char *std_pointer);
 
     static inline float toRadians(float angle) {

@@ -13,16 +13,20 @@
 
 class Window {
 public:
-    Window(Scene *_scene, int _width, int _height, std::string _title);
+    Window(Scene *_scene, int _width, int _height, std::string _title, bool use_mouse);
     Window(Scene *_scene, std::string _title);
+    Window(Scene *_scene, bool use_mouse);
     Window(Scene *_scene);
     ~Window();
     void init();
     void show();
     void loop();
     static void KeyPressedHandler(GLFWwindow *window, int key, int scancode, int action, int mods);
+    static void MousePosHandler(GLFWwindow* window, double xpos, double ypos);
+    static void MouseScrollHandler(GLFWwindow* window, double xpos, double ypos);
 
 private:
+    bool use_mouse = false;
     Scene *scene;
     GLFWwindow *window;
     int height;

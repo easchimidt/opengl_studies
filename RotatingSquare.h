@@ -22,10 +22,13 @@ public:
     RotatingSquare() {}
     ~RotatingSquare();
     void init();
-    void update(float secs);
+    void update(GLfloat secs);
     void draw();
     void deinit();
+    void mousePos(GLFWwindow* window, double xpos, double ypos);
+    void mouseScroll(GLFWwindow* window, double xpos, double ypos);
     void keyPressed(GLFWwindow *window, int key, int scancode, int action, int mods);
+    void handleKeysPressed(GLfloat secs);
 
     float angleX, angleY;
 };

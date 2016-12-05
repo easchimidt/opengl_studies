@@ -19,20 +19,21 @@ using namespace std;
 // This is exactly the solution suggested by GLFW in its FAQ, question 2.16.
 Scene* scene_copy_for_handlers;
 
-Window::Window(Scene *_scene, int _width, int _height, std::string _title) :
-        scene(_scene), width(_width), height(_height), title(_title)  {
+Window::Window(Scene *_scene, int _width, int _height, std::string _title, bool _use_mouse) :
+        scene(_scene), width(_width), height(_height), title(_title), use_mouse(_use_mouse)  {
     scene_copy_for_handlers = _scene;
 }
 
-Window::Window(Scene *_scene, std::string _title) : Window(_scene, 800, 600, _title) {}
+Window::Window(Scene *_scene, std::string _title) : Window(_scene, 800, 600, _title, false) {}
 
-Window::Window(Scene *_scene) : Window(_scene, 800, 600, "Window") {}
+Window::Window(Scene *_scene, bool use_mouse) : Window(_scene, 800, 600, "Window", use_mouse) {}
+
+Window::Window(Scene *_scene) : Window(_scene, 800, 600, "Window", false) {}
 
 void Window::init() {
 
     if (glfwInit() != GLFW_TRUE) {
-        throw std::invalid_argument("Error initiating GLFW." );
-        exit(1);
+        throw std::invalid_argument("Error initiating GLFW.");
     }
 
     glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
@@ -45,12 +46,18 @@ void Window::init() {
     window = glfwCreateWindow(width, height, title.c_str(), NULL, NULL);
 
     if (window == NULL) {
-        throw std::invalid_argument("Error creating Window." );
         glfwTerminate();
-        exit(1);
+        throw std::invalid_argument("Error creating Window.");
     }
 
     glfwSetKeyCallback(window, Window::KeyPressedHandler);
+
+    if (use_mouse) {
+        glfwSetCursorPosCallback(window, Window::MousePosHandler);
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+        glfwSetScrollCallback(window, Window::MouseScrollHandler);
+    }
 
     // Get the resolution of the primary monitor
     const GLFWvidmode *vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
@@ -73,15 +80,12 @@ void Window::loop() {
 
     scene->init();
 
-    typedef high_resolution_clock Time;
-    typedef duration<float> fsec;
-
-    auto before = Time::now();
+    GLfloat before = glfwGetTime();
     while ( glfwWindowShouldClose(window) == GLFW_FALSE ) {
-        auto fs = Time::now() - before;
-        before = Time::now();
-        float time = duration_cast<fsec>(fs).count();
-        scene->update(time);
+        GLfloat delta = glfwGetTime() - before;
+        before = glfwGetTime();
+
+        scene->update(delta);
         scene->draw();
 
         glfwSwapBuffers(window);
@@ -91,7 +95,13 @@ void Window::loop() {
 }
 
 void Window::show() {
-    init();
+    try {
+        init();
+    }
+    catch (std::invalid_argument& ia) {
+        std::cerr << "Error scene initialization. " << ia.what() << std::endl;
+        exit(1);
+    }
     loop();
     glfwDestroyWindow(window);
     delete this;
@@ -103,4 +113,12 @@ Window::~Window() {
 
 void Window::KeyPressedHandler (GLFWwindow *window, int key, int scancode, int action, int mods) {
     scene_copy_for_handlers->keyPressed(window, key, scancode, action, mods);
+}
+
+void Window::MousePosHandler(GLFWwindow* window, double xpos, double ypos) {
+    scene_copy_for_handlers->mousePos(window, xpos, ypos);
+}
+
+void Window::MouseScrollHandler(GLFWwindow* window, double xpos, double ypos) {
+    scene_copy_for_handlers->mouseScroll(window, xpos, ypos);
 }

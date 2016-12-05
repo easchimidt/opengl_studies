@@ -4,11 +4,22 @@
 
 #include <iostream>
 #include <fstream>
-#include <iostream>
 #include <math.h>
 #include "MeshFactory.h"
 #include "MeshBuilder.h"
 #include "Utils.h"
+
+Mesh* MeshFactory::createSquare() {
+    return (new MeshBuilder())
+        ->addVector3fAttribute("aPosition",
+                      { -0.5f, 0.5f, 0.0f,
+                        -0.5f, -0.5f, 0.0f,
+                         0.5f, -0.5f, 0.0f,
+                         0.5f, 0.5f, 0.0f})
+        ->setIndexBuffer({0, 1, 2, 3, 0, 2})
+        ->loadShader({"/Users/emanuel/ClionProjects/estudosOpenGL/shader/shader"})
+        ->create();
+}
 
 Mesh *MeshFactory::createCube() {
     return (new MeshBuilder())
@@ -212,7 +223,7 @@ Mesh* MeshFactory::loadTerrain(std::string filename, float scale) {
     struct Utils::Image image;
 
     try {
-        Utils::readImageFile(filename, &image);
+        Utils::readImageFile(filename, &image, true);
     }
     catch (const std::string& ex) {
         std::cout << "Exception reading file in MeshFactory::loadTerrain. Error: " << ex << std::endl;
@@ -224,24 +235,17 @@ Mesh* MeshFactory::loadTerrain(std::string filename, float scale) {
     indexBuffer.reserve(image.width * image.height);
 
     std::vector<glm::vec3> vertex;
-    vertex.reserve(image.width * image.height * 6); // it is needed 6 indexes to create each small square. we have (width - 1) * (depth - 1) squares in grid
+    vertex.reserve((image.width-1) * (image.height-1) * 6); // it is needed 6 indexes to create each small square. we have (width - 1) * (depth - 1) squares in grid
 
     int max_value = 0;
-    if (image.rgb != NULL) {
-        for (long i = 0; i < image.height * image.width * image.bpp; i+=image.bpp) { // increments image.bpp bytes (bpp means bytes per pixel)
-            int pixel_value = (int) image.rgb[i];
-            if (max_value < pixel_value)
-                max_value = pixel_value;
-        }
-    }
-
-    std::cout << max_value << std::endl;
 
     // Build vertex array
-    for (int y = 0; y < image.height; y++) {
+    for (int z = 0; z < image.height; z++) {
         for (int x = 0; x < image.width; x++) {
-            int value = (int) image.rgb[(x * image.bpp) + (y * image.width)];
-            vertex.push_back(glm::vec3(x - h_width, value * scale, y - h_height));
+            int value = (int) image.rgb[(z * image.width) + x];
+            vertex.push_back(glm::vec3(x - h_width, value * scale, z - h_height));
+
+            max_value = max_value < value ? value : max_value;
         }
     }
 

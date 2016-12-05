@@ -9,6 +9,7 @@
 
 class MeshFactory {
 public:
+    static Mesh* createSquare();
     static Mesh* createCube();
     static Mesh* createPlane(int depth, int width);
     static Mesh* createSphere(float ratio, int hSlices, int vSlices);

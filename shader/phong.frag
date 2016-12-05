@@ -1,9 +1,5 @@
 #version 330
 
-in vec4 vColor;
-
-out vec4 outColor;
-
 uniform vec3 uAmbientLight;
 
 void main() {
